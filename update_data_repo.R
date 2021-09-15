@@ -1,18 +1,15 @@
-devtools::install_github("danmorse314/hockeyR")
+##  Updating the hockeyR data repo
 
-library(tidyverse)
-library(hockeyR)
-library(glue)
-library(git2r)
+#devtools::install_github("danmorse314/hockeyR")
 
 # get current season data
-pbp <- load_pbp()
+pbp <- hockeyR::load_pbp()
 
 # get day's pbp data
-pbp_day <- scrape_day()
+pbp_day <- hockeyR::scrape_day()
 
 # combine
-pbp_updated <- bind_rows(pbp, pbp_day)
+pbp_updated <- dplyr::bind_rows(pbp, pbp_day)
 
 if(is.null(pbp) & nrow(pbp_updated) > 0){
   # first save of the season
@@ -37,22 +34,20 @@ if(new_data){
   season_first <- substr(last(pbp_updated$season), 1,4)
   season_last <- substr(last(pbp_updated$season), 7,8)
 
-  filename <- glue("data/play_by_play_{season_first}_{season_last}")
+  filename <- glue::glue("data/play_by_play_{season_first}_{season_last}")
 
-  pbp_updated |> saveRDS(glue("{filename}.rds"))
-  pbp_updated |> crunch::write.csv.gz(glue("{filename}.csv.gz"))
+  pbp_updated |> saveRDS(glue::glue("{filename}.rds"))
+  pbp_updated |> crunch::write.csv.gz(glue::glue("{filename}.csv.gz"))
 
   # push to github
-  repo <- repository(getwd())
+  repo <- git2r::repository(getwd())
 
-  add(repo, glue("{filename}.rds"))
-  add(repo, glue("{filename}.csv.gz"))
+  git2r::add(repo, glue::glue("{filename}.rds"))
+  git2r::add(repo, glue::glue("{filename}.csv.gz"))
 
   #git2r::pull(repo)
 
-  commit(repo, message = paste0("Data updated: ", Sys.time()))
+  git2r::commit(repo, message = glue::glue("Data updated: {Sys.time()}"))
 
-  push(repo, credentials = cred_token())
+  git2r::push(repo, credentials = git2r::cred_token())
 }
-
-
