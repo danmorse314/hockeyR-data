@@ -6,7 +6,8 @@
 pbp <- hockeyR::load_pbp()
 
 # get day's pbp data
-pbp_day <- hockeyR::scrape_day()
+#   running for yesterday, because this code runs after midnight
+pbp_day <- hockeyR::scrape_day(Sys.Date()-1)
 
 # combine
 pbp_updated <- dplyr::bind_rows(pbp, pbp_day)
