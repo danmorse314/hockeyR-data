@@ -32,8 +32,8 @@ if(is.null(pbp) & nrow(pbp_updated) > 0){
 
 if(new_data){
   # new games added, create save file
-  season_first <- substr(last(pbp_updated$season), 1,4)
-  season_last <- substr(last(pbp_updated$season), 7,8)
+  season_first <- substr(dplyr::last(pbp_updated$season), 1,4)
+  season_last <- substr(dplyr::last(pbp_updated$season), 7,8)
 
   filename <- glue::glue("data/play_by_play_{season_first}_{season_last}")
 
