@@ -3,7 +3,7 @@
 #devtools::install_github("danmorse314/hockeyR")
 
 # get current season data
-pbp <- hockeyR::load_pbp(2022)
+pbp <- hockeyR::load_pbp()
 
 # check for missing days
 #unique(pbp$game_date)
@@ -13,7 +13,7 @@ max(pbp$game_date)
 
 # get day's pbp data
 #   running for yesterday, because this code runs after midnight
-#pbp_day <- hockeyR::scrape_day(Sys.Date())
+#pbp_day <- hockeyR::scrape_day(Sys.Date()-1)
 
 # scrape multiple days
 pbp_day <- purrr::map_dfr(
