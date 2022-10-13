@@ -1,8 +1,11 @@
 name: hockeyR-data-update
 
 on:
-  schedule:
-      - cron: '0 8 * * *'
+  push:
+    branches:
+      - main
+  #schedule:
+  #    - cron: '0 8 * * *'
 
 jobs:
   hockeyR-data-update:
