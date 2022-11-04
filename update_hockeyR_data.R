@@ -4,7 +4,7 @@ install.packages(c("dplyr","glue","crunch","remotes"))
 remotes::install_github("danmorse314/hockeyR")
 
 # get current season data
-pbp <- hockeyR::load_pbp()
+pbp <- hockeyR::load_pbp(shift_events = TRUE)
 
 # get day's pbp data
 #   running for yesterday, because this code runs after midnight
