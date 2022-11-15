@@ -3,26 +3,38 @@
 #devtools::install_github("danmorse314/hockeyR")
 
 # get current season data
-pbp <- hockeyR::load_pbp()
+pbp <- hockeyR::load_pbp(shift_events = TRUE)
 
-# check for missing days
-#unique(pbp$game_date)
+# check for missing shift data in certain games
+ids_to_pull <- pbp |>
+  dplyr::filter(period == 3) |>
+  dplyr::group_by(game_id) |>
+  dplyr::summarize(changes = sum(event_type == "CHANGE")) |>
+  dplyr::filter(changes == 0) |>
+  dplyr::pull(game_id)
 
-# view most recent update
-max(pbp$game_date)
-
-# get day's pbp data
-#   running for yesterday, because this code runs after midnight
-#pbp_day <- hockeyR::scrape_day(Sys.Date()-1)
-
-# scrape multiple days
+# scrape multiple games with missing data
 pbp_day <- purrr::map_dfr(
-  .x = seq(max(pbp$game_date) + 1,Sys.Date(),1),
-  ~hockeyR::scrape_day(.x)
+  .x = ids_to_pull,
+  ~hockeyR::scrape_game(.x)
 )
 
+# check to see if it actually worked
+pbp_day |>
+  dplyr::filter(period == 3) |>
+  dplyr::group_by(game_id) |>
+  dplyr::summarize(changes = sum(event_type == "CHANGE")) |>
+  dplyr::filter(changes == 0)
+# should return a tibble with 0 rows
+
+# getting the reverse in function
+library(hockeyR)
+
 # combine
-pbp_updated <- dplyr::bind_rows(pbp, pbp_day) |>
+pbp_updated <- dplyr::bind_rows(
+  dplyr::filter(pbp, game_id %not_in% ids_to_pull),
+  pbp_day
+  ) |>
   dplyr::distinct()
 
 if(is.null(pbp) & nrow(pbp_updated) > 0){
