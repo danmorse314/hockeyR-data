@@ -10,8 +10,13 @@ pbp <- hockeyR::load_pbp(shift_events = TRUE)
 #   running for yesterday, because this code runs after midnight
 pbp_day <- hockeyR::scrape_day(Sys.Date()-1)
 
+`%not_in%` <- `%in%`
+
 # combine
-pbp_updated <- dplyr::bind_rows(pbp, pbp_day) |>
+pbp_updated <- dplyr::bind_rows(
+  dplyr::filter(pbp, game_id %not_in% unique(pbp_day$game_id)),
+  pbp_day
+  ) |>
   dplyr::distinct()
 
 season_first <- substr(dplyr::last(pbp_updated$season), 1,4)
