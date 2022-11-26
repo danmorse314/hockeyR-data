@@ -14,7 +14,7 @@ pbp_day <- hockeyR::scrape_day(Sys.Date()-1)
 
 # combine
 pbp_updated <- dplyr::bind_rows(
-  dplyr::filter(pbp, game_id %not_in% unique(pbp_day$game_id)),
+  pbp,
   pbp_day
   ) |>
   dplyr::distinct()
