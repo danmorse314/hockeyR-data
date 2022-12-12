@@ -14,18 +14,21 @@ ids_to_pull <- pbp |>
   dplyr::pull(game_id)
 
 # scrape multiple games with missing data
-pbp_day <- purrr::map_dfr(
-  .x = ids_to_pull,
-  ~hockeyR::scrape_game(.x)
-)
 
-# check to see if it actually worked
-pbp_day |>
-  dplyr::filter(period == 3) |>
-  dplyr::group_by(game_id) |>
-  dplyr::summarize(changes = sum(event_type == "CHANGE")) |>
-  dplyr::filter(changes == 0)
-# should return a tibble with 0 rows
+if(length(ids_to_pull) > 0){
+  pbp_day <- purrr::map_dfr(
+    .x = ids_to_pull,
+    ~hockeyR::scrape_game(.x)
+  )
+
+  # check to see if it actually worked
+  pbp_day |>
+    dplyr::filter(period == 3) |>
+    dplyr::group_by(game_id) |>
+    dplyr::summarize(changes = sum(event_type == "CHANGE")) |>
+    dplyr::filter(changes == 0)
+  # should return a tibble with 0 rows
+}
 
 # getting the reverse in function
 library(hockeyR)
@@ -34,8 +37,18 @@ library(hockeyR)
 pbp_updated <- dplyr::bind_rows(
   dplyr::filter(pbp, game_id %not_in% ids_to_pull),
   pbp_day
-  ) |>
+) |>
   dplyr::distinct()
+
+# scraping whole season up to a point
+#games <- hockeyR::get_game_ids(season = 2023)
+
+#games <- dplyr::filter(games, date < Sys.Date())
+
+#pbp_updated <- purrr::map_dfr(
+#  .x = games$game_id,
+#  ~hockeyR::scrape_game(.x)
+#)
 
 if(is.null(pbp) & nrow(pbp_updated) > 0){
   # first save of the season
