@@ -15,7 +15,7 @@ pbp_day <- hockeyR::scrape_day(Sys.Date()-1)
 # combine
 pbp_updated <- dplyr::bind_rows(
   pbp,
-  pbp_day
+  pbp_day |> dplyr::mutate(season_type = as.character(season_type))
   ) |>
   dplyr::distinct()
 
