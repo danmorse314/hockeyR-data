@@ -10,13 +10,17 @@ pbp <- hockeyR::load_pbp(shift_events = TRUE)
 #   running for yesterday, because this code runs after midnight
 pbp_day <- hockeyR::scrape_day(Sys.Date()-1)
 
-`%not_in%` <- `%in%`
+`%not_in%` <- hockeyR::`%not_in%`
+
+# make sure we're not double loading some games
+pbp_day <- dplyr::filter(pbp_day, game_id %not_in% unique(pbp$game_id))
 
 # combine
 pbp_updated <- dplyr::bind_rows(
   pbp,
   pbp_day |> dplyr::mutate(season_type = as.character(season_type))
   ) |>
+  # another check to make sure there's no doubled up plays
   dplyr::distinct()
 
 season_first <- substr(dplyr::last(pbp_updated$season), 1,4)
