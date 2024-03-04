@@ -3,6 +3,8 @@
 install.packages(c("dplyr","glue","crunch","remotes"))
 remotes::install_github("danmorse314/hockeyR")
 
+team_logos_colors <- hockeyR::team_logos_colors
+
 # get current season data
 pbp <- hockeyR::load_pbp(shift_events = TRUE)
 
